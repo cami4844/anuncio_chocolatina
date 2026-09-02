@@ -1,0 +1,73 @@
+/* Fuentes locales CHACOQUIRA (latin) */
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../assets/fonts/fraunces-i-500.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: italic;
+  font-weight: 650;
+  font-display: swap;
+  src: url(../assets/fonts/fraunces-i-650.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../assets/fonts/fraunces-n-500.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Fraunces';
+  font-style: normal;
+  font-weight: 650;
+  font-display: swap;
+  src: url(../assets/fonts/fraunces-n-650.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url(../assets/fonts/outfit-n-300.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(../assets/fonts/outfit-n-400.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url(../assets/fonts/outfit-n-500.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url(../assets/fonts/outfit-n-600.woff2) format('woff2');
+  
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(../assets/fonts/outfit-n-700.woff2) format('woff2');
+  
+}
