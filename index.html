@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>CHACOQUIRA — Cada celebración tiene su chocolate</title>
+  <meta name="description" content="CHACOQUIRA: chocolate premium + masmelos para las seis celebraciones del año. Pascua, Día de la Madre, Día del Padre, Amor y Amistad, Halloween y Navidad. Descubre el comercial, la colección 3D y las escenas eliminadas.">
+  <meta name="theme-color" content="#0e0703">
+  <link rel="icon" href="favicon.ico">
+  <meta property="og:title" content="CHACOQUIRA — Chocolate + Masmelos">
+  <meta property="og:description" content="Cada celebración tiene su chocolate. Descubre el universo CHACOQUIRA: comercial, colección 3D y detrás de cámaras.">
+  <meta property="og:image" content="assets/img/poster/comercial.jpg">
+  <meta property="og:type" content="website">
+
+  <!-- Patrón GATE: los estados ocultos solo aplican si el JS arranca -->
+  <script>
+    window.__errs = [];
+    window.addEventListener('error', function (e) {
+      window.__errs.push((e.message || 'error') + ' @ ' + (e.filename || '').split('/').pop() + ':' + (e.lineno || 0));
+    });
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('anim-js');
+    }
+  </script>
+
+  <link rel="stylesheet" href="css/fuentes.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/secciones.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <a class="ir-al-contenido" href="#concepto">Ir al contenido</a>
+
+  <!-- cursor de chocolate -->
+  <div class="cursor-choco" aria-hidden="true">
+    <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="2" width="28" height="28" rx="7" fill="#2e1a0c"/>
+      <rect x="4.5" y="4.5" width="10.4" height="10.4" rx="2.4" fill="#4a2a14"/>
+      <rect x="17.1" y="4.5" width="10.4" height="10.4" rx="2.4" fill="#5a3418"/>
+      <rect x="4.5" y="17.1" width="10.4" height="10.4" rx="2.4" fill="#5a3418"/>
+      <rect x="17.1" y="17.1" width="10.4" height="10.4" rx="2.4" fill="#6b3d1c"/>
+      <path d="M6 5.5 Q16 2.5 26 5.5" stroke="#8a5630" stroke-width="1.6" fill="none" stroke-linecap="round" opacity="0.85"/>
+    </svg>
+  </div>
+  <div class="cursor-aro" aria-hidden="true"></div>
+
+  <!-- ============ PRELOADER ============ -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="pre-caja">
+      <img class="pre-logo" src="assets/img/logo.webp" alt="">
+      <div class="pre-gota"></div>
+      <div class="pre-barra"></div>
+      <span class="pre-dato">0%</span>
+    </div>
+  </div>
+
+  <!-- ============ PROGRESO + NAV ============ -->
+  <div class="progreso" aria-hidden="true"><div class="progreso-barra" id="progreso-barra"></div></div>
+
+  <nav class="nav" id="nav" aria-label="Principal">
+    <a class="nav-logo" href="#inicio" aria-label="CHACOQUIRA — inicio">
+      <img src="assets/img/logo.webp" alt="CHACOQUIRA">
+    </a>
+    <ul class="nav-links">
+      <li><a href="#inicio">Inicio</a></li>
+      <li><a href="#concepto">Concepto</a></li>
+      <li><a href="#comercial">El comercial</a></li>
+      <li><a href="#celebraciones">Celebraciones</a></li>
+      <li><a href="#coleccion">Colección 3D</a></li>
+      <li><a href="#escenas">Escenas eliminadas</a></li>
+      <li><a href="#cierre">Cierre</a></li>
+    </ul>
+    <div class="nav-lado">
+      <button class="btn-audio" id="btn-audio" aria-label="Escuchar el spot de Chacoquira" aria-pressed="false">
+        <span class="ecualizador" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <span class="rotulo">Spot</span>
+      </button>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="inicio" aria-label="Portada CHACOQUIRA">
+      <div class="hero-fondo" aria-hidden="true">
+        <video id="hero-video" muted loop playsinline preload="metadata"></video>
+      </div>
+      <canvas class="hero-particulas" id="hero-particulas" aria-hidden="true"></canvas>
+      <div class="brillo-mouse" aria-hidden="true"></div>
+
+      <div class="hero-contenido" id="hero-contenido">
+        <div class="hero-logo" id="hero-logo" data-cursor="pulso">
+          <img src="assets/img/logo.webp" alt="CHACOQUIRA — Chocolate + Masmelos" decoding="async">
+        </div>
+        <p class="hero-eslogan" id="hero-eslogan">Cada celebración tiene <em>su chocolate.</em></p>
+        <div class="hero-chips" id="hero-chips">
+          <span class="chip"><span class="punto"></span>Ediciones únicas para momentos increíbles</span>
+          <span class="chip"><span class="punto"></span>Chocolate de verdad</span>
+          <span class="chip"><span class="punto"></span>6 celebraciones, 6 piezas</span>
+        </div>
+        <div class="hero-ctas" id="hero-ctas">
+          <a class="btn btn-solido" href="#comercial" data-magnet data-cursor="pulso">Ver el comercial</a>
+          <a class="btn" href="#coleccion" data-magnet data-cursor="pulso">Explorar la colección 3D</a>
+        </div>
+      </div>
+
+      <div class="hero-indicador" aria-hidden="true">
+        <span>Desliza</span>
+        <span class="hilo"></span>
+      </div>
+    </section>
+
+    <!-- ============ CINTA DE CELEBRACIONES ============ -->
+    <div class="cinta" aria-hidden="true">
+      <div class="cinta-pista">
+        <span class="cinta-item"><b>Pascua</b> — 5 de abril</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Día de la Madre</b> — 10 de mayo</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Día del Padre</b> — 21 de junio</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Amor y Amistad</b> — 19 de septiembre</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Halloween</b> — 31 de octubre</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Navidad</b> — 25 de diciembre</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Pascua</b> — 5 de abril</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Día de la Madre</b> — 10 de mayo</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Día del Padre</b> — 21 de junio</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Amor y Amistad</b> — 19 de septiembre</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Halloween</b> — 31 de octubre</span>
+        <span class="cinta-item">✦</span>
+        <span class="cinta-item"><b>Navidad</b> — 25 de diciembre</span>
+        <span class="cinta-item">✦</span>
+      </div>
+    </div>
+
+    <!-- ============ CONCEPTO ============ -->
+    <section class="seccion concepto" id="concepto">
+      <div class="contenedor">
+        <div class="concepto-cabecera">
+          <span class="kicker rev">El concepto</span>
+          <h2 class="concepto-frase palabras">Hay momentos que merecen <span class="palabra-dulce">algo especial.</span></h2>
+          <p class="texto-suave concepto-lead rev">CHACOQUIRA nace para darles chocolate: la mezcla premium con masmelos suaves y cremosos, seis piezas de colección y una sola idea que lo une todo. Esta es la extensión digital de la campaña — el lugar donde la marca se explora, se oye y se siente.</p>
+        </div>
+
+        <div class="pilares rev">
+          <div class="pilar">
+            <span class="pilar-simbolo">✦</span>
+            <h3>Una persona</h3>
+            <p>Cada pieza está pensada para un momento real: el tuyo.</p>
+          </div>
+          <div class="pilar">
+            <span class="pilar-simbolo">◆</span>
+            <h3>Seis celebraciones</h3>
+            <p>Pascua, Madre, Padre, Amor y Amistad, Halloween y Navidad.</p>
+          </div>
+          <div class="pilar">
+            <span class="pilar-simbolo">✧</span>
+            <h3>Chocolate premium</h3>
+            <p>Chocolate de verdad, acabado artesanal, brillo de campaña.</p>
+          </div>
+          <div class="pilar">
+            <span class="pilar-simbolo">✦</span>
+            <h3>Masmelos</h3>
+            <p>Suavidad y melosidad escondidas en cada quiebre.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EL COMERCIAL ============ -->
+    <section class="seccion comercial" id="comercial">
+      <div class="contenedor">
+        <span class="kicker rev">El comercial</span>
+        <h2 class="h2-grande palabras" style="margin-top:1rem">Setenta segundos.<br><span class="acento-i">Seis celebraciones.</span></h2>
+        <p class="texto-suave rev" style="max-width:58ch; margin-top:1.2rem">La campaña completa: Pascua, Día de la Madre, Día del Padre, Amor y Amistad, Halloween y Navidad, con cierre de marca. Mejor con sonido.</p>
+
+        <div class="cine rev">
+          <div class="cine-escenario" id="cine-escenario">
+            <video id="comercial-video" preload="metadata" playsinline></video>
+            <div class="cine-poster" id="cine-poster">
+              <img alt="Fotograma del comercial CHACOQUIRA">
+            </div>
+            <div class="cine-capas">
+              <div class="cine-titulo">
+                <span class="k">CHACOQUIRA — Spot oficial</span>
+                <span class="t">Cada celebración tiene su chocolate</span>
+              </div>
+              <button class="btn-play-central" id="btn-play-central" aria-label="Reproducir el comercial" data-magnet>
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+              <div class="cine-error" id="cine-error">El video no cargó — revisa tu conexión</div>
+            </div>
+          </div>
+
+          <div class="cine-controles">
+            <button class="cine-btn" id="cine-btn-play" aria-label="Reproducir o pausar">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <div class="cine-progreso" id="cine-progreso" role="slider" aria-label="Avance del video" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+              <div class="riel"><div class="llenado"></div></div>
+            </div>
+            <span class="cine-tiempo" id="cine-tiempo">0:00 / 0:00</span>
+            <button class="cine-btn" id="cine-btn-mute" aria-label="Silenciar o activar sonido">
+              <svg viewBox="0 0 24 24"><path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+            </button>
+            <button class="cine-btn" id="cine-btn-full" aria-label="Pantalla completa">
+              <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+
+          <div class="cine-pie">
+            <span class="chip"><span class="punto"></span><span id="chip-duracion">70</span> segundos</span>
+            <span class="chip"><span class="punto"></span><span id="chip-calidad">HD</span></span>
+            <span class="chip"><span class="punto"></span>Audio incluido</span>
+          </div>
+        </div>
+
+        <div class="spot-audio rev">
+          <div class="spot-disco" aria-hidden="true"></div>
+          <div class="spot-info">
+            <h3>El audio del spot</h3>
+            <p>Narrador + música pop + coros. Setenta segundos listos para la radio o para acompañar el comercial.</p>
+          </div>
+          <button class="btn btn-mini" id="btn-spot" data-cursor="pulso">Escuchar</button>
+          <div class="spot-onda" aria-hidden="true">
+            <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CELEBRACIONES ============ -->
+    <section class="celebraciones" id="celebraciones" aria-label="Las seis celebraciones">
+      <div class="celebra-pin" id="celebra-pin">
+        <div class="celebra-pista" id="celebra-pista"></div>
+        <div class="celebra-avance" aria-hidden="true">
+          <span class="rotulo">00 / 07</span>
+          <div class="riel"><div class="llenado"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ COLECCIÓN 3D ============ -->
+    <section class="seccion coleccion" id="coleccion">
+      <div class="contenedor">
+        <div class="coleccion-cab">
+          <span class="kicker rev">La colección</span>
+          <h2 class="h2-grande rev">Exposición digital<br><span class="acento-i">de producto.</span></h2>
+          <p class="texto-suave rev" style="max-width:56ch">Las piezas en tres dimensiones, con luz de campaña. Gíralas, acércalas y míralas desde donde quieras — como en una vitrina que nunca cierra.</p>
+        </div>
+
+        <div class="expo rev">
+          <div class="expo-vitrina" id="expo-vitrina" data-cursor="pulso" aria-label="Vitrina 3D interactiva">
+            <div class="expo-foco" aria-hidden="true"></div>
+            <div class="expo-piso" aria-hidden="true"></div>
+            <div id="expo-canvas-host" style="position:absolute;inset:0"></div>
+
+            <div class="expo-cargando" id="expo-cargando">
+              <div class="expo-carga-caja">
+                <div class="expo-anillo" aria-hidden="true"></div>
+                <span class="expo-dato">Preparando la pieza</span>
+              </div>
+            </div>
+
+            <div class="expo-fallback" id="expo-fallback">
+              <div class="caja">
+                <span class="pilar-simbolo" style="font-size:2rem">◆</span>
+                <h3 style="font-size:1.3rem">La vitrina necesita un servidor</h3>
+                <p style="margin:0;color:var(--crema-suave);font-size:0.92rem">El modelo 3D no se pudo cargar aquí. El resto de la experiencia sigue funcionando; para ver la vitrina, abre el sitio con el iniciador local.</p>
+                <button class="btn btn-mini" id="expo-reintentar">Reintentar</button>
+              </div>
+            </div>
+
+            <div class="expo-hints" aria-hidden="true">
+              <span class="chip">Arrastra para girar</span>
+              <span class="chip">Rueda o pellizco para acercar</span>
+              <span class="chip">Doble clic reencuadra</span>
+            </div>
+          </div>
+
+          <aside class="expo-panel">
+            <div class="expo-tabs" role="tablist">
+              <button class="expo-tab activo" data-modelo="chocolatina" role="tab" aria-selected="true">
+                <span class="nom">Chocolatina Clásica</span>
+                <span class="lin">La pieza de colección</span>
+              </button>
+              <button class="expo-tab" data-modelo="trozos" role="tab" aria-selected="false">
+                <span class="nom">Trozos y Masmelos</span>
+                <span class="lin">El quiebre perfecto</span>
+              </button>
+            </div>
+            <div class="expo-detalle">
+              <span class="chip" style="justify-self:start"><span class="punto"></span>Pieza 3D real del proyecto</span>
+              <h3 id="expo-det-nombre">Chocolatina Clásica</h3>
+              <p id="expo-det-linea" style="margin:0;font-size:0.72rem;letter-spacing:0.24em;text-transform:uppercase;color:var(--oro)">La pieza de colección</p>
+              <p id="expo-det-desc">La chocolatina CHACOQUIRA con su envoltura de marca. Chocolate premium, formato perfecto para regalar (o no compartir).</p>
+            </div>
+            <div class="expo-acciones">
+              <button class="btn-mini" id="expo-gira">Girar</button>
+              <button class="btn-mini" id="expo-cerca">Acercar</button>
+              <button class="btn-mini" id="expo-lejos">Alejar</button>
+            </div>
+            <div class="expo-nota-file" id="expo-nota-file">
+              Estás abriendo el sitio directo desde el archivo. Para la vitrina 3D, inicia el servidor con <code>CHACOQUIRA-WEB.bat</code> (doble clic) o ejecuta <code>python -m http.server 8123</code> en esta carpeta y abre <code>http://127.0.0.1:8123</code>.
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ESCENAS ELIMINADAS ============ -->
+    <section class="seccion escenas" id="escenas">
+      <div class="contenedor">
+        <div class="escenas-cab">
+          <span class="kicker rev">Escenas eliminadas</span>
+          <h2 class="h2-grande palabras">Todo se rodó <span class="acento-i">dos veces.</span></h2>
+          <p class="texto-suave rev">Antes del chocolate cinematográfico hubo un patio de colegio: uniformes, sol de las diez de la mañana, guiones memorizados a las carreras y muchas tomas falsas. Esta es la parte del proceso que no sale en el comercial — y también la que lo hizo posible. Un equipo que se tomó las fotos, se transformó con IA y terminó protagonizando su propia campaña.</p>
+        </div>
+
+        <div class="proceso-pasos">
+          <div class="paso rev">
+            <span class="paso-num">01</span>
+            <span class="paso-flecha">→</span>
+            <h3>La toma real</h3>
+            <p>Cada celebración se actuó de verdad en el patio del colegio. El celular era la única cámara y el recreo, el set de grabación.</p>
+          </div>
+          <div class="paso rev">
+            <span class="paso-num">02</span>
+            <span class="paso-flecha">→</span>
+            <h3>La transformación</h3>
+            <p>Las fotos del equipo se transformaron con IA (ChatGPT) para crear el reparto: mismos gestos, nuevos mundos.</p>
+          </div>
+          <div class="paso rev">
+            <span class="paso-num">03</span>
+            <span class="paso-flecha">→</span>
+            <h3>El rodaje digital</h3>
+            <p>De las fotos transformadas nacieron las escenas: jardines de Pascua, fiestas de Halloween, mesas de Navidad.</p>
+          </div>
+          <div class="paso rev">
+            <span class="paso-num">04</span>
+            <span class="paso-flecha">→</span>
+            <h3>El montaje final</h3>
+            <p>Setenta segundos para seis celebraciones. Lo que no entró, vive aquí abajo.</p>
+          </div>
+        </div>
+
+        <h3 class="h2-grande rev" style="font-size:clamp(1.5rem,3vw,2.2rem); margin-top:clamp(2.6rem,5vw,4rem)">Del patio al set</h3>
+        <p class="texto-suave rev" style="margin-top:0.6rem">Desliza cada tarjeta: a la izquierda la toma real, a la derecha el retrato transformado con IA.</p>
+        <div class="comparadores" id="comparadores"></div>
+
+        <div class="tomas-muro">
+          <div class="tomas-cabecera">
+            <div>
+              <h3 class="h2-grande rev" style="font-size:clamp(1.5rem,3vw,2.2rem)">Las tomas que sobrevivieron</h3>
+              <p class="texto-suave rev" style="margin-top:0.5rem">Fotogramas reales del proceso. Ninguna actuación fue dañada durante el rodaje — solo fue filmada.</p>
+            </div>
+            <span class="chip rev"><span class="punto"></span>Material original del equipo</span>
+          </div>
+          <div class="mosaico" id="mosaico-tomas"></div>
+        </div>
+
+        <div class="revelo-grid">
+          <div class="revelo-caja">
+            <div class="revelo-titulo rev">
+              <h3>Contactos del celular</h3>
+              <span class="chip"><span class="punto"></span>Originales + transformadas con IA</span>
+            </div>
+            <div class="contactos-franja rev" id="contactos-franja"></div>
+          </div>
+          <div class="proceso-pila">
+            <div class="revelo-titulo rev">
+              <h3>El cuarto de edición</h3>
+            </div>
+            <div id="proceso-pila" class="proceso-pila-inner" style="display:grid;gap:1rem"></div>
+          </div>
+        </div>
+
+        <div>
+          <h3 class="h2-grande rev" style="font-size:clamp(1.5rem,3vw,2.2rem); margin-top:clamp(2.6rem,5vw,4rem)">Hecho por el equipo</h3>
+          <p class="texto-suave rev" style="margin-top:0.6rem">Cinco integrantes, seis celebraciones, una sola campaña. Los retratos son sus versiones transformadas con IA.</p>
+          <div class="equipo-fila" id="equipo-fila"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EMPAQUE ============ -->
+    <section class="seccion empaque" id="empaque">
+      <div class="contenedor empaque-escena">
+        <div class="centrado" style="display:grid;gap:1.2rem;justify-items:center">
+          <span class="kicker rev">El empaque</span>
+          <h2 class="h2-grande rev">El universo completo<br><span class="acento-i">en una caja.</span></h2>
+          <p class="texto-suave rev" style="max-width:52ch">Diseño de empaque de la campaña: las seis piezas, las seis fechas y la marca completa. Acércalo con el mouse.</p>
+        </div>
+        <div class="empaque-marco rev" id="empaque-marco" data-cursor="pulso">
+          <img src="assets/img/logo-completo.webp" alt="Diseño completo del empaque CHACOQUIRA con las seis celebraciones" loading="lazy" decoding="async">
+          <div class="empaque-brillo" aria-hidden="true"></div>
+        </div>
+        <div class="empaque-fechas rev">
+          <span class="fecha-chip"><span class="c">Pascua</span><span class="f">5 de abril</span></span>
+          <span class="fecha-chip"><span class="c">Día de la Madre</span><span class="f">10 de mayo</span></span>
+          <span class="fecha-chip"><span class="c">Día del Padre</span><span class="f">21 de junio</span></span>
+          <span class="fecha-chip"><span class="c">Amor y Amistad</span><span class="f">19 de septiembre</span></span>
+          <span class="fecha-chip"><span class="c">Halloween</span><span class="f">31 de octubre</span></span>
+          <span class="fecha-chip"><span class="c">Navidad</span><span class="f">25 de diciembre</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CIERRE ============ -->
+    <section class="cierre" id="cierre">
+      <canvas class="cierre-particulas" id="cierre-particulas" aria-hidden="true"></canvas>
+      <div class="cierre-caja">
+        <img class="cierre-logo rev" id="cierre-logo" src="assets/img/logo.webp" alt="CHACOQUIRA — Chocolate + Masmelos" data-cursor="pulso">
+        <p class="cierre-eslogan rev">Cada celebración tiene su chocolate.</p>
+        <p class="cierre-frase rev">Siente la ocasión. Siente Chacoquira.</p>
+        <span class="chip rev cierre-pista" id="cierre-pista">Psst — haz clic en el logo</span>
+        <div class="cierre-redes rev" id="cierre-redes"></div>
+        <div class="cierre-pie rev">
+          <span><span class="oro">CHACOQUIRA</span> — Chocolate + Masmelos</span>
+          <span>Experiencia digital hecha por el equipo de la campaña — <span id="anio">2026</span></span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============ LIGHTBOX ============ -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Vista ampliada">
+    <div class="lightbox-caja">
+      <div class="lightbox-pie">
+        <span class="lightbox-titulo" id="lightbox-titulo"></span>
+        <button class="lightbox-cerrar" id="lightbox-cerrar" aria-label="Cerrar">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CREDITOS FINALES ============ -->
+  <div class="creditos" id="creditos" aria-hidden="true">
+    <div class="creditos-rollo" id="creditos-rollo"></div>
+    <button class="lightbox-cerrar creditos-cerrar" id="creditos-cerrar" aria-label="Cerrar créditos">✕</button>
+  </div>
+
+  <!-- ============ LIBRERÍAS LOCALES ============ -->
+  <script src="assets/lib/three.min.js"></script>
+  <script src="assets/lib/GLTFLoader.js"></script>
+  <script src="assets/lib/meshopt_decoder.js"></script>
+  <script src="assets/lib/gsap.min.js"></script>
+  <script src="assets/lib/ScrollTrigger.min.js"></script>
+
+  <!-- ============ DATOS Y LÓGICA ============ -->
+  <script src="config.js"></script>
+  <script src="js/datos.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/scroll.js"></script>
+  <script src="js/video.js"></script>
+  <script src="js/models3d.js"></script>
+  <script src="js/bts.js"></script>
+
+  <script>
+    // barra de progreso de lectura + chips desde config
+    (function () {
+      var bar = document.getElementById('progreso-barra');
+      function upd() {
+        var h = document.documentElement;
+        var p = h.scrollTop / (Math.max(1, h.scrollHeight - h.clientHeight));
+        bar.style.transform = 'scaleX(' + p + ')';
+      }
+      window.addEventListener('scroll', upd, { passive: true });
+      window.addEventListener('resize', upd);
+      upd();
+
+      var CFG = window.CHACO_CONFIG;
+      var dur = document.getElementById('chip-duracion');
+      var cal = document.getElementById('chip-calidad');
+      if (dur && CFG.ajustes.duracionComercial) dur.textContent = CFG.ajustes.duracionComercial;
+      if (cal && CFG.ajustes.calidadChip) cal.textContent = CFG.ajustes.calidadChip;
+
+      // botones de la vitrina (girar / acercar / alejar) vía eventos sintéticos
+      function estimula(nombre) {
+        var vit = document.getElementById('expo-vitrina');
+        if (!vit) return;
+        vit.dispatchEvent(new CustomEvent('chaco-vitrina', { detail: nombre }));
+      }
+      var g = document.getElementById('expo-gira');
+      var c = document.getElementById('expo-cerca');
+      var l = document.getElementById('expo-lejos');
+      if (g) g.addEventListener('click', function () { estimula('girar'); });
+      if (c) c.addEventListener('click', function () { estimula('cerca'); });
+      if (l) l.addEventListener('click', function () { estimula('lejos'); });
+    })();
+  </script>
+
+</body>
+</html>
