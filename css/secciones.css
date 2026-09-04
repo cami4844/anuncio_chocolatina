@@ -584,25 +584,6 @@
 }
 .btn-mini:hover { border-color: var(--oro-suave); color: var(--crema); background: rgba(233, 185, 92, 0.08); }
 
-.expo-nota-file {
-  margin-top: 0.9rem;
-  padding: 0.9rem 1.2rem;
-  border-radius: var(--radio-chico);
-  border: 1px solid rgba(233, 185, 92, 0.35);
-  background: rgba(233, 185, 92, 0.07);
-  font-size: 0.85rem;
-  color: var(--crema-suave);
-  display: none;
-}
-.expo-nota-file.visible { display: block; }
-.expo-nota-file code {
-  font-family: Consolas, monospace;
-  color: var(--oro);
-  background: rgba(0,0,0,0.4);
-  padding: 0.1rem 0.45rem;
-  border-radius: 6px;
-}
-
 /* ============ ESCENAS ELIMINADAS ============ */
 .escenas {
   background:
@@ -1011,33 +992,11 @@
   position: absolute; top: 1.4rem; right: 1.4rem;
 }
 
-/* lightbox de tomas */
-.lightbox {
-  position: fixed; inset: 0; z-index: 550;
-  display: grid; place-items: center;
-  background: rgba(5, 2, 1, 0.92);
-  backdrop-filter: blur(10px);
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.4s, visibility 0.4s;
-}
-.lightbox.abierta { opacity: 1; visibility: visible; }
-.lightbox-caja {
-  position: relative;
-  width: min(1080px, 94vw);
-  display: grid;
-  gap: 0.8rem;
-}
-.lightbox-caja video, .lightbox-caja img {
-  width: 100%;
-  max-height: 76vh;
-  border-radius: var(--radio);
-  border: 1px solid var(--ch-borde2);
-  object-fit: contain;
-  background: #000;
-}
-.lightbox-pie { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-.lightbox-titulo { font-family: var(--f-display); font-size: 1.1rem; }
+/* --------------------------------------------------------------
+   Visor de ampliación de imágenes (lightbox) RETIRADO v5:
+   las imágenes del proyecto no se abren en grande. Se conservan
+   solo .lightbox-cerrar (lo usa el cierre de créditos).
+   -------------------------------------------------------------- */
 .lightbox-cerrar {
   width: 46px; height: 46px;
   border-radius: 50%;

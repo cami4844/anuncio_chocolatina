@@ -1,7 +1,12 @@
 /* ============================================================
    CHACOQUIRA — ESCENAS ELIMINADAS
-   Comparadores antes/después (arrastre + teclado),
-   reproducción de tomas reales y lightbox de imágenes.
+   Comparadores antes/después (arrastre + teclado).
+   ------------------------------------------------------------
+   NOTA v5: el visor de ampliación de imágenes (lightbox) fue
+   RETIRADO por decisión de protección: las imágenes del
+   proyecto ya no se abren en grande, ni por clic, ni por
+   teclado, ni por doble toque. Los comparadores de arrastre
+   se conservan: no amplían nada, solo revelan dos capas.
    ============================================================ */
 (function () {
   'use strict';
@@ -41,89 +46,5 @@
       if (e.key === 'End') { corte = 100; aplica(); }
     });
     aplica();
-  });
-
-  /* ================= MOSAICO DE TOMAS → LIGHTBOX ================= */
-  $$('.mosaico-item').forEach((fig) => {
-    const img = $('img', fig);
-    const pie = $('.mosaico-pie .t', fig);
-    const titulo = pie ? pie.textContent : 'Toma real';
-    fig.addEventListener('click', () => abreLightbox(img.src, titulo, false));
-    fig.setAttribute('tabindex', '0');
-    fig.setAttribute('role', 'button');
-    fig.setAttribute('aria-label', 'Ampliar: ' + titulo);
-    fig.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fig.click(); }
-    });
-  });
-
-  /* ================= LIGHTBOX ================= */
-  const lb = $('#lightbox');
-  const lbCaja = $('.lightbox-caja');
-  const lbTitulo = $('#lightbox-titulo');
-  const lbCerrar = $('#lightbox-cerrar');
-  let ultimoFoco = null;
-  let contenidoActual = null;
-
-  function abreLightbox(src, titulo, esVideo) {
-    ultimoFoco = document.activeElement;
-    if (contenidoActual) { contenidoActual.remove(); contenidoActual = null; }
-    const el = document.createElement(esVideo ? 'video' : 'img');
-    el.src = src;
-    if (esVideo) {
-      el.controls = true;
-      el.autoplay = true;
-      el.playsInline = true;
-      el.muted = false;
-    } else {
-      el.alt = titulo || '';
-    }
-    lbCaja.insertBefore(el, lbCaja.firstChild);
-    contenidoActual = el;
-    if (lbTitulo) lbTitulo.textContent = titulo || '';
-    lb.classList.add('abierta');
-    document.addEventListener('keydown', teclas);
-    setTimeout(() => lbCerrar && lbCerrar.focus(), 60);
-  }
-  function cierraLightbox() {
-    lb.classList.remove('abierta');
-    if (contenidoActual) {
-      if (contenidoActual.tagName === 'VIDEO') contenidoActual.pause();
-      setTimeout(() => { contenidoActual && contenidoActual.remove(); contenidoActual = null; }, 250);
-    }
-    document.removeEventListener('keydown', teclas);
-    if (ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
-  }
-  function teclas(e) {
-    if (e.key === 'Escape') cierraLightbox();
-  }
-  if (lb) {
-    lbCerrar.addEventListener('click', cierraLightbox);
-    lb.addEventListener('click', (e) => { if (e.target === lb) cierraLightbox(); });
-  }
-
-  // contactos crudos + capturas de proceso → lightbox
-  $$('.contacto').forEach((fig) => {
-    const img = $('img', fig);
-    const pie = $('figcaption', fig);
-    const titulo = pie ? pie.textContent : 'Foto del equipo';
-    fig.addEventListener('click', () => abreLightbox(img.src, titulo, false));
-    fig.setAttribute('tabindex', '0');
-    fig.setAttribute('role', 'button');
-    fig.setAttribute('aria-label', 'Ampliar: ' + titulo);
-    fig.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fig.click(); }
-    });
-  });
-  $$('.proceso-foto').forEach((fig) => {
-    const img = $('img', fig);
-    const pie = $('figcaption', fig);
-    fig.addEventListener('click', () => abreLightbox(img.src, pie ? pie.textContent : 'Proceso', false));
-    fig.setAttribute('tabindex', '0');
-    fig.setAttribute('role', 'button');
-    fig.setAttribute('aria-label', 'Ampliar ' + (pie ? pie.textContent : 'captura'));
-    fig.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fig.click(); }
-    });
   });
 })();

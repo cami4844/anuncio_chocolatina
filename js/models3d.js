@@ -1,7 +1,7 @@
 /* ============================================================
    CHACOQUIRA — COLECCIÓN 3D
    Vitrina de productos con Three.js.
-   - Carga perezosa: el modelo solo baja cuando la vitrina se acerca.
+   - Carga perezosa: el modelo solo se prepara cuando la vitrina se acerca.
    - Decodificador Meshopt (modelos comprimidos con gltfpack).
    - Arrastrar para girar (con inercia), rueda/pellizco para zoom,
      doble clic para reencuadrar, auto-giro cuando nadie interactúa.
@@ -21,13 +21,63 @@
   const cargaCaja = $('#expo-cargando');
   const cargaDato = $('.expo-dato');
   const fallback = $('#expo-fallback');
-  const notaFile = $('#expo-nota-file');
   const tabs = $$('.expo-tab');
   const detNombre = $('#expo-det-nombre');
   const detLinea = $('#expo-det-linea');
   const detDesc = $('#expo-det-desc');
 
-  const esFile = location.protocol === 'file:';
+  /* --- CARGA PEREZOSA DE LIBRERÍAS 3D -----------------------------------
+     Three.js + Meshopt + GLTFLoader ya NO viajan en el HTML de apertura
+     (eran ~724 KB). Se descargan aquí, solo cuando el usuario se acerca
+     a la vitrina. Prioridad de rendimiento: 3D es el último eslabón. */
+  let promesaLibs = null;
+  function cargaScript(src) {
+    return new Promise(function (res, rej) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function () { res(src); };
+      s.onerror = function () { rej(new Error('No se pudo descargar ' + src)); };
+      document.head.appendChild(s);
+    });
+  }
+  function cargaLibrerias3D() {
+    if (window.THREE && window.THREE.GLTFLoader) return Promise.resolve();
+    if (!promesaLibs) {
+      promesaLibs = cargaScript('assets/lib/three.min.js')
+        .then(function () {
+          if (!window.THREE) throw new Error('THREE no disponible tras la descarga');
+          return cargaScript('assets/lib/meshopt_decoder.js');
+        })
+        .then(function () { return cargaScript('assets/lib/GLTFLoader.js'); })
+        .then(function () {
+          if (!window.THREE || !window.THREE.GLTFLoader) throw new Error('GLTFLoader no disponible tras la descarga');
+          registra('3d', 'Librerías 3D descargadas bajo demanda (apertura más ligera)');
+        });
+    }
+    return promesaLibs;
+  }
+  /* los cambios de tab / reintentos esperan a que las librerías estén */
+  function cuandoLibs(fn) {
+    cargaLibrerias3D().then(fn).catch(function (e) {
+      muestraFallback('Librerías 3D no disponibles — ' + (e && e.message ? e.message : e));
+    });
+  }
+
+  /* --- Función D: registro si la capa de seguridad está presente --- */
+  function registra(cat, msg, nivel) {
+    try {
+      if (window.CHACO_FUNCIOND) window.CHACO_FUNCIOND.registrar(cat, msg, nivel);
+    } catch (e) {}
+  }
+
+  /* --- sonda WebGL: evita intentar montar un visor imposible --- */
+  function webglDisponible() {
+    try {
+      var c = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext &&
+        (c.getContext('webgl') || c.getContext('experimental-webgl')));
+    } catch (e) { return false; }
+  }
 
   let renderer = null;
   let escena = null;
@@ -194,54 +244,58 @@
     return objeto;
   }
 
+  function muestraFallback(motivo) {
+    cargaCaja.classList.add('fuera');
+    fallback.classList.add('visible');
+    if (motivo) registra('3d', motivo, 'error');
+  }
+
+  function base64ABuffer(b64) {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes.buffer;
+  }
+
   function cargaModelo(def) {
     const miId = ++cargandoId;
     cargaCaja.classList.remove('fuera');
     fallback.classList.remove('visible');
-    if (cargaDato) cargaDato.textContent = 'Preparando la pieza — 0%';
+    if (cargaDato) cargaDato.textContent = 'Preparando la pieza…';
+
+    /* red de seguridad: si la red se cuelga, nunca dejar la vitrina en falso */
+    const TEMPOR = setTimeout(() => {
+      if (miId === cargandoId) {
+        cargandoId += 1; // invalida la cadena en curso
+        muestraFallback('Timeout de carga (45 s): ' + def.url);
+      }
+    }, 45000);
 
     const loader = new THREE.GLTFLoader();
     if (typeof MeshoptDecoder !== 'undefined') {
       loader.setMeshoptDecoder(MeshoptDecoder);
     }
 
-    const gestion = (pct) => {
-      if (miId === cargandoId && cargaDato) cargaDato.textContent = 'Preparando la pieza — ' + pct + '%';
-    };
-
-    fetch(def.url)
-      .then((resp) => {
-        if (!resp.ok) throw new Error('HTTP ' + resp.status);
-        if (!resp.body) return resp.arrayBuffer();
-        const total = parseInt(resp.headers.get('Content-Length') || '0', 10);
-        const lector = resp.body.getReader();
-        let recibido = 0;
-        const trozos = [];
-        function bombea() {
-          return lector.read().then(({ done, value }) => {
-            if (miId !== cargandoId) { lector.cancel(); throw new Error('cancelada'); }
-            if (done) {
-              const buf = new Uint8Array(recibido);
-              let off = 0;
-              trozos.forEach((t) => { buf.set(t, off); off += t.length; });
-              return buf.buffer;
-            }
-            recibido += value.length;
-            trozos.push(value);
-            if (total) gestion(Math.round((recibido / total) * 100));
-            return bombea();
-          });
-        }
-        return bombea();
+    /* El modelo viaja como módulo local: se carga con <script src> y por
+       tanto funciona igual con doble clic al index que publicada en línea,
+       sin descargas de red, sin CORS y sin servidor. */
+    cargaScript(def.url)
+      .then(() => {
+        if (miId !== cargandoId) return null;
+        const b64 = (window.CHACO_GLB || {})[def.id];
+        if (!b64) throw new Error('Datos del modelo no encontrados en ' + def.url);
+        clearTimeout(TEMPOR);
+        return base64ABuffer(b64);
       })
       .then((buffer) => {
-        if (miId !== cargandoId) return;
+        if (!buffer || miId !== cargandoId) return;
         return new Promise((resolve, reject) => {
           loader.parse(buffer, '', (gltf) => resolve(gltf), reject);
         });
       })
       .then((gltf) => {
         if (miId !== cargandoId) return;
+        clearTimeout(TEMPOR);
         limpiaModelo();
         // sintonía de materiales: reflejos con el entorno cálido y legibilidad
         const texEntorno = escena.userData.texEntorno || null;
@@ -264,14 +318,15 @@
         st.rotY = -0.5; st.rotX = 0.12; st.dist = st.distObj = 6.2;
         entraModelo();
         cargaCaja.classList.add('fuera');
+        clearTimeout(TEMPOR);
         st.quietoDesde = performance.now();
       })
       .catch((err) => {
-        if (miId !== cargandoId && String(err && err.message) !== 'cancelada') return;
+        clearTimeout(TEMPOR);
+        if (miId !== cargandoId) return;
         cargaCaja.classList.add('fuera');
-        if (String(err && err.message) === 'cancelada') return;
         fallback.classList.add('visible');
-        if (esFile && notaFile) notaFile.classList.add('visible');
+        registra('3d', 'Fallo al cargar ' + def.url + ' — ' + (err && err.message ? err.message : err), 'error');
       });
   }
 
@@ -328,9 +383,13 @@
     });
   }
 
-  /* ---------- bucle ---------- */
+  /* ---------- bucle ----------
+     ESTABILIDAD v4: el bucle se DUERME cuando la vitrina sale de la
+     pantalla y se despierta al volver (antes requestAnimationFrame se
+     re-programaba indefinidamente aunque nadie viera el 3D). */
+  let rafId = 0;
   function bucle() {
-    requestAnimationFrame(bucle);
+    rafId = 0;
     if (!visible || !renderer) return;
     const dt = Math.min(0.05, reloj.getDelta());
     const t = reloj.elapsedTime;
@@ -355,7 +414,11 @@
     camara.lookAt(0, 0.35, 0);
 
     renderer.render(escena, camara);
+    rafId = requestAnimationFrame(bucle);
   }
+  function despierta3D() { if (!rafId && visible && renderer) rafId = requestAnimationFrame(bucle); }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) despierta3D(); });
+  vitrina.addEventListener('chaco-vitrina', despierta3D);
 
   /* ---------- interfaz ---------- */
   function eligeTab(id) {
@@ -368,41 +431,58 @@
     cargaModelo(def);
   }
 
-  tabs.forEach((t) => t.addEventListener('click', () => eligeTab(t.getAttribute('data-modelo'))));
+  tabs.forEach((t) => t.addEventListener('click', () => cuandoLibs(() => eligeTab(t.getAttribute('data-modelo')))));
   const btnReintentar = $('#expo-reintentar');
-  if (btnReintentar) btnReintentar.addEventListener('click', () => eligeTab(activo));
+  if (btnReintentar) btnReintentar.addEventListener('click', () => { promesaLibs = null; cuandoLibs(() => eligeTab(activo)); });
 
   // arranque perezoso: cuando la vitrina se acerca a la vista
   const obsArranque = new IntersectionObserver((en) => {
     if (!en[0].isIntersecting) return;
     obsArranque.disconnect();
-    if (typeof THREE === 'undefined' || typeof THREE.GLTFLoader === 'undefined') {
-      cargaCaja.classList.add('fuera');
-      fallback.classList.add('visible');
-      if (notaFile) notaFile.classList.add('visible');
+    if (!webglDisponible()) {
+      muestraFallback('WebGL no disponible en este navegador');
       return;
     }
     if (!iniciado) {
       iniciado = true;
-      try {
-        creaNave();
-        vinceGestos();
-        // botones del panel: girar / acercar / alejar
-        vitrina.addEventListener('chaco-vitrina', (e) => {
-          if (e.detail === 'girar') st.velY += 0.09;
-          if (e.detail === 'cerca') st.distObj = Math.max(3.4, st.distObj - 1.2);
-          if (e.detail === 'lejos') st.distObj = Math.min(9.5, st.distObj + 1.2);
-          st.quietoDesde = performance.now();
-        });
-        bucle();
-        eligeTab(activo);
-      } catch (e) {
-        cargaCaja.classList.add('fuera');
-        fallback.classList.add('visible');
-      }
+      /* 1) baja las librerías solo ahora; 2) monta la vitrina */
+      cuandoLibs(function () {
+        try {
+          creaNave();
+          vinceGestos();
+
+          /* Función D: si la GPU se reinicia, la vitrina se recupera sola.
+             webglcontextlost exige preventDefault para permitir el restore. */
+          renderer.domElement.addEventListener('webglcontextlost', (e) => {
+            e.preventDefault();
+            muestraFallback('Contexto WebGL perdido (GPU reiniciada) — se intentará recuperar');
+          });
+          renderer.domElement.addEventListener('webglcontextrestored', () => {
+            fallback.classList.remove('visible');
+            ajustaTamano();
+            eligeTab(activo);
+            registra('3d', 'Contexto WebGL restaurado — modelo recargado');
+          });
+
+          // botones del panel: girar / acercar / alejar
+          vitrina.addEventListener('chaco-vitrina', (e) => {
+            if (e.detail === 'girar') st.velY += 0.09;
+            if (e.detail === 'cerca') st.distObj = Math.max(3.4, st.distObj - 1.2);
+            if (e.detail === 'lejos') st.distObj = Math.min(9.5, st.distObj + 1.2);
+            st.quietoDesde = performance.now();
+          });
+          bucle();
+          eligeTab(activo);
+        } catch (e) {
+          muestraFallback('No se pudo iniciar el visor 3D — ' + (e && e.message ? e.message : e));
+        }
+      });
     }
   }, { rootMargin: '420px 0px' });
   obsArranque.observe(vitrina);
 
-  new IntersectionObserver((en) => { visible = en[0].isIntersecting; }, { threshold: 0.05 }).observe(vitrina);
+  new IntersectionObserver((en) => {
+    visible = en[0].isIntersecting;
+    if (visible) despierta3D();
+  }, { threshold: 0.05 }).observe(vitrina);
 })();

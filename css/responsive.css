@@ -12,8 +12,16 @@
   .comparador { width: calc((100% - clamp(1rem, 2.2vw, 1.6rem)) / 2); }
 }
 
+/* ---------- tablet intermedia: nav compacta sin aplastar el logo ---------- */
+@media (min-width: 761px) and (max-width: 1180px) {
+  .nav-links a { padding: 0.4rem 0.55rem; font-size: 0.66rem; letter-spacing: 0.1em; }
+  .nav-links { gap: 0.1rem; }
+  .btn-audio .rotulo { display: none; }
+  .btn-audio { padding: 0.5rem 0.7rem; }
+}
+
 /* ---------- celular ---------- */
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .nav { padding-inline: 1rem; }
   .nav-logo img { height: 38px; }
   .nav.compacta .nav-logo img { height: 32px; }
@@ -50,7 +58,7 @@
   .mosaico-item, .mosaico-item:nth-child(4n + 1) { grid-column: span 1; grid-row: span 1; }
   .mosaico-item:nth-child(5n + 1) { grid-column: span 2; }
   .mosaico-pie { padding: 1.1rem 0.6rem 0.45rem; }
-  .mosaico-pie .t { display: none; }   /* en móvil el título vive en el lightbox */
+  .mosaico-pie .t { display: inline; font-size: 0.6rem; }  /* el título se ve siempre: ya no hay lightbox */
   .mosaico-pie .p { font-size: 0.56rem; }
 
   .tomas-muro { margin-top: clamp(2.4rem, 8vw, 3.4rem); }
@@ -84,6 +92,6 @@
 
 /* ---------- impresión (sólo referencia) ---------- */
 @media print {
-  .nav, .progreso, .preloader, .cursor-punto, .cursor-aro, .hero-particulas, .lightbox { display: none !important; }
+  .nav, .progreso, .preloader, .hero-particulas { display: none !important; }
   body { background: #fff; color: #111; }
 }

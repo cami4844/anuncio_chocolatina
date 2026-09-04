@@ -170,7 +170,8 @@ html.anim-js .rev-palabra { display: inline-block; opacity: 0; transform: transl
   backdrop-filter: blur(14px);
   border-bottom-color: var(--ch-borde);
 }
-.nav-logo img { height: 46px; width: auto; transition: height 0.4s; }
+.nav-logo { flex: none; }
+.nav-logo img { height: 46px; width: auto; aspect-ratio: 3 / 1; transition: height 0.4s; }
 .nav.compacta .nav-logo img { height: 38px; }
 
 .nav-links { display: flex; align-items: center; gap: 0.4rem; list-style: none; margin: 0; padding: 0; }
@@ -223,57 +224,9 @@ html.anim-js .rev-palabra { display: inline-block; opacity: 0; transform: transl
 .btn-audio.sonando .ecualizador i:nth-child(4) { animation-delay: 0.45s; }
 @keyframes ecualiza { 0%, 100% { height: 4px; } 50% { height: 12px; } }
 
-/* ---------- cursor de chocolate ---------- */
-@media (hover: hover) and (pointer: fine) {
-  html.cursor-on, html.cursor-on a, html.cursor-on button { cursor: none; }
-  html.cursor-on body { cursor: none; }
-}
-.cursor-choco, .cursor-aro {
-  position: fixed; top: -100px; left: -100px; z-index: 500;
-  pointer-events: none;
-  opacity: 0;
-}
-.cursor-choco {
-  width: 30px; height: 30px;
-  transform: translate(-50%, -50%) rotate(-8deg);
-  transition: width 0.25s var(--ease-back), height 0.25s var(--ease-back);
-  will-change: transform;
-}
-.cursor-choco svg {
-  width: 100%; height: 100%;
-  filter: drop-shadow(0 5px 12px rgba(0, 0, 0, 0.55));
-  display: block;
-}
-.cursor-choco.creciendo { width: 46px; height: 46px; }
-.cursor-choco.mordiendo { width: 22px; height: 22px; }
-.cursor-aro {
-  width: 40px; height: 40px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(233, 185, 92, 0.4);
-  transform: translate(-50%, -50%);
-  transition: width 0.25s var(--ease-out), height 0.25s var(--ease-out),
-              border-color 0.25s, background 0.25s;
-}
-.cursor-aro.creciendo { width: 64px; height: 64px; border-color: var(--magenta-suave); background: rgba(255, 45, 120, 0.06); }
-.cursor-aro.pulsando { width: 26px; height: 26px; border-color: var(--masmelo); background: rgba(255, 244, 234, 0.1); }
-html.cursor-on .cursor-choco, html.cursor-on .cursor-aro { opacity: 1; }
-
-/* migas de chocolate que caen del cursor */
-.miga {
-  position: fixed; z-index: 499;
-  width: 6px; height: 6px;
-  border-radius: 2px;
-  background: #4a2612;
-  pointer-events: none;
-  opacity: 0.95;
-  animation: cae-miga 0.9s ease-in forwards;
-}
-.miga.clara { background: #7a4222; }
-.miga.rosada { background: #c98aa4; }
-@keyframes cae-miga {
-  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.95; }
-  100% { transform: translate(var(--mx, 0px), 46px) rotate(var(--mr, 160deg)); opacity: 0; }
-}
+/* ---------- cursor nativo ----------
+   El puntero es el del sistema: coherencia total entre lo que se ve
+   y donde se hace clic (el cursor personalizado se retiró). */
 
 /* brillo cálido que sigue al mouse (hero) */
 .brillo-mouse {

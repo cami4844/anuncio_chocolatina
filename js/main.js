@@ -15,9 +15,13 @@
   const fino = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const esMovil = window.matchMedia('(max-width: 760px)').matches;
 
-  document.documentElement.classList.toggle('cursor-on', fino && !reducido);
+  /* El puntero es siempre el cursor nativo del sistema: lo que se ve es
+     exactamente donde se hace clic, en todas las páginas. */
 
-  /* ================= PRELOADER ================= */
+  /* ================= PRELOADER =================
+     Sale con el DOM listo (+ una animación mínima), NO con window.load.
+     Así la experiencia abre de inmediato aunque el resto de recursos
+     (video, 3D bajo demanda) siga llegando en segundo plano. */
   const pre = $('#preloader');
   let preListo = false;
   function preAvance(p) {
@@ -33,88 +37,23 @@
     if (pre) pre.classList.add('fuera');
     document.dispatchEvent(new CustomEvent('chaco:preloader-fuera'));
   }
-  preAvance(8);
+  preAvance(12);
   const logoPre = new Image();
-  logoPre.onload = () => preAvance(46);
+  logoPre.onload = () => preAvance(52);
   logoPre.src = 'assets/img/logo.webp';
-  // la barra avanza sola mientras carga el resto (nunca bloquea)
-  let preProg = 8;
-  const preT = setInterval(() => { preProg += (92 - preProg) * 0.12; preAvance(preProg); }, 140);
-  window.addEventListener('load', () => { clearInterval(preT); setTimeout(preFuera, reducido ? 60 : 340); });
-  setTimeout(() => { clearInterval(preT); preFuera(); }, 4200); // red de seguridad
-
-  /* ================= CURSOR DE CHOCOLATE ================= */
-  if (fino && !reducido) {
-    const choco = $('.cursor-choco');
-    const aro = $('.cursor-aro');
-    if (choco && aro) {
-      let mx = -100, my = -100, ax = -100, ay = -100;
-      let ultimaMiga = 0, migasVivas = 0;
-
-      window.addEventListener('mousemove', (e) => {
-        mx = e.clientX; my = e.clientY;
-        choco.style.left = mx + 'px';
-        choco.style.top = my + 'px';
-        // migas: se desmorona un poquito mientras recorre la página
-        const ahora = performance.now();
-        if (ahora - ultimaMiga > 150 && migasVivas < 8) {
-          ultimaMiga = ahora;
-          migasVivas += 1;
-          const miga = document.createElement('span');
-          miga.className = 'miga' + (Math.random() < 0.3 ? ' clara' : (Math.random() < 0.14 ? ' rosada' : ''));
-          miga.style.left = (mx + (Math.random() * 18 - 9)) + 'px';
-          miga.style.top = (my + 8) + 'px';
-          miga.style.setProperty('--mx', (Math.random() * 26 - 13) + 'px');
-          miga.style.setProperty('--mr', (120 + Math.random() * 220) + 'deg');
-          document.body.appendChild(miga);
-          setTimeout(() => { miga.remove(); migasVivas -= 1; }, 950);
-        }
-      }, { passive: true });
-
-      (function anillo() {
-        ax += (mx - ax) * 0.16; ay += (my - ay) * 0.16;
-        aro.style.left = ax + 'px';
-        aro.style.top = ay + 'px';
-        requestAnimationFrame(anillo);
-      })();
-
-      document.addEventListener('mouseover', (e) => {
-        const t = e.target.closest('[data-cursor], a, button, input, .comparador-escena');
-        if (!t) return;
-        const tipo = t.getAttribute && t.getAttribute('data-cursor');
-        choco.classList.add('creciendo');
-        aro.classList.add('creciendo');
-        aro.classList.toggle('pulsando', tipo === 'pulso');
-      });
-      document.addEventListener('mouseout', (e) => {
-        if (e.target.closest('[data-cursor], a, button, input, .comparador-escena')) {
-          choco.classList.remove('creciendo');
-          aro.classList.remove('creciendo', 'pulsando');
-        }
-      });
-      document.addEventListener('mousedown', () => {
-        choco.classList.add('mordiendo');
-        aro.classList.add('pulsando');
-        // al morder: tres migas extra
-        for (let i = 0; i < 3; i++) {
-          if (migasVivas >= 12) break;
-          migasVivas += 1;
-          const miga = document.createElement('span');
-          miga.className = 'miga' + (Math.random() < 0.4 ? ' clara' : '');
-          miga.style.left = (mx + (Math.random() * 26 - 13)) + 'px';
-          miga.style.top = (my + 6) + 'px';
-          miga.style.setProperty('--mx', (Math.random() * 40 - 20) + 'px');
-          miga.style.setProperty('--mr', (160 + Math.random() * 260) + 'deg');
-          document.body.appendChild(miga);
-          setTimeout(() => { miga.remove(); migasVivas -= 1; }, 950);
-        }
-      });
-      document.addEventListener('mouseup', () => {
-        choco.classList.remove('mordiendo');
-        aro.classList.remove('pulsando');
-      });
-    }
+  // la barra avanza sola mientras el DOM termina de montar (nunca bloquea)
+  let preProg = 12;
+  const preT = setInterval(() => { preProg += (90 - preProg) * 0.16; preAvance(preProg); }, 110);
+  let preCerrado = false;
+  function preCierra() {
+    if (preCerrado) return;
+    preCerrado = true;
+    clearInterval(preT);
+    setTimeout(preFuera, reducido ? 60 : 240);
   }
+  document.addEventListener('DOMContentLoaded', () => setTimeout(preCierra, 300));
+  window.addEventListener('load', preCierra);
+  setTimeout(preCierra, 2600); // red de seguridad
 
   /* ================= NAVEGACIÓN ================= */
   const nav = $('#nav');
@@ -284,7 +223,6 @@
         // mosaico: algunas piezas grandes para romper la cuadrícula uniforme
         const grande = n % 5 === 1 || n % 5 === 4;
         el.className = 'mosaico-item rev' + (grande ? ' mosaico-grande' : '');
-        el.setAttribute('data-cursor', 'pulso');
         el.innerHTML = `
           <img src="${src}" alt="${t.titulo}" loading="lazy" decoding="async">
           <figcaption class="mosaico-pie">
@@ -376,10 +314,11 @@
     }
     function paso() {
       ctx.clearRect(0, 0, W, H);
+      let hayMuertos = false;
       particulas.forEach((p) => {
         if (p.tipo === 'burst') {
           p.x += p.vx; p.y += p.vy; p.vy += 0.06; p.vida -= 1; p.rot += p.vr * 4;
-          if (p.vida <= 0) p.muerto = true;
+          if (p.vida <= 0) { p.muerto = true; hayMuertos = true; }
         } else {
           p.fase += 0.012;
           p.y -= p.vy * p.amp;
@@ -396,9 +335,21 @@
         }
         dibuja(p);
       });
-      particulas = particulas.filter((p) => !p.muerto);
+      // ESTABILIDAD: solo filtramos cuando de verdad hay muertos (evita
+      // asignar un array nuevo en cada frame durante toda la sesión)
+      if (hayMuertos) particulas = particulas.filter((p) => !p.muerto);
     }
-    function bucle() { if (activo) { paso(); } requestAnimationFrame(bucle); }
+    /* ESTABILIDAD v4: el bucle se DUERME cuando el lienzo no está en
+       pantalla y se despierta al volver. Antes requestAnimationFrame se
+       re-programaba para siempre (2 lienzos = trabajo perpetuo). */
+    let rafId = 0;
+    function bucle() {
+      rafId = 0;
+      if (!activo) return;
+      paso();
+      rafId = requestAnimationFrame(bucle);
+    }
+    function despierta() { if (!rafId && activo) rafId = requestAnimationFrame(bucle); }
     let activo = true;
     if (reducido) { activo = false; }
 
@@ -410,13 +361,16 @@
     }, { passive: true });
     canvas.parentElement.addEventListener('mouseleave', () => { raton.x = -9999; raton.y = -9999; });
 
-    window.addEventListener('resize', medir);
+    window.addEventListener('resize', () => { medir(); });
     medir();
     if (!reducido) {
-      // solo dibuja cuando el contenedor es visible
-      new IntersectionObserver((en) => { activo = en[0].isIntersecting; }, { threshold: 0.02 })
-        .observe(canvas.parentElement);
-      bucle();
+      // solo dibuja cuando el contenedor es visible; dormido el resto del tiempo
+      new IntersectionObserver((en) => {
+        activo = en[0].isIntersecting;
+        if (activo) despierta();
+      }, { threshold: 0.02 }).observe(canvas.parentElement);
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) despierta(); });
+      despierta();
     }
     return {
       estalla(x, y, n) {
@@ -527,23 +481,16 @@
     hero.addEventListener('mouseleave', () => brillo.classList.remove('visible'));
     (function sigue() {
       bx += (tx - bx) * 0.08; by += (ty - by) * 0.08;
-      brillo.style.left = bx + 'px'; brillo.style.top = by + 'px';
+      // ESTABILIDAD: transform en vez de left/top (sin layout por frame)
+      brillo.style.transform = 'translate3d(' + bx + 'px,' + by + 'px,0) translate(-50%,-50%)';
       requestAnimationFrame(sigue);
     })();
   }
 
-  /* ================= MAGNETISMO ================= */
-  if (fino && !reducido) {
-    $$('[data-magnet]').forEach((el) => {
-      el.addEventListener('mousemove', (e) => {
-        const r = el.getBoundingClientRect();
-        const dx = (e.clientX - r.left - r.width / 2) / r.width;
-        const dy = (e.clientY - r.top - r.height / 2) / r.height;
-        el.style.transform = `translate(${dx * 12}px, ${dy * 9}px)`;
-      });
-      el.addEventListener('mouseleave', () => { el.style.transform = ''; });
-    });
-  }
+  /* ================= MAGNETISMO =================
+   Retirado: los botones ya se desplazan al acercar el mouse y eso
+   hacía percibir el clic «en otra parte». Objetos fijos = puntero
+   100% coherente. */
 
   /* ================= INCLINACIÓN 3D (empaque) ================= */
   if (fino && !reducido) {

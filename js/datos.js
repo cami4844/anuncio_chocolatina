@@ -163,7 +163,7 @@ window.CHACO_DATOS = {
 
   // contactos: fotos originales de cada integrante (nombradas por Cami) + su transformación IA
   contactos: [
-    { src: 'assets/img/bts/raw-david.jpg?v=2', pie: 'Original — David' },
+    { src: 'assets/img/bts/antes-david.jpg?v=2', pie: 'Original — David' },
     { src: 'assets/img/bts/toma-david-vampiro.jpg?v=2', pie: 'Transformada — David', transformada: true },
     { src: 'assets/img/bts/raw-laura-1.jpg', pie: 'Original — Laura' },
     { src: 'assets/img/bts/toma-laura-pascua.jpg?v=2', pie: 'Transformada — Laura', transformada: true },
@@ -171,7 +171,7 @@ window.CHACO_DATOS = {
     { src: 'assets/img/bts/toma-mariana-amor.jpg?v=2', pie: 'Transformada — Mariana', transformada: true },
     { src: 'assets/img/bts/raw-mafe.jpg?v=2', pie: 'Original — Mafe' },
     { src: 'assets/img/bts/toma-mafe-doble.jpg?v=2', pie: 'Transformada — Mafe', transformada: true },
-    { src: 'assets/img/bts/raw-camilo.jpg?v=2', pie: 'Original — Camilo' },
+    { src: 'assets/img/bts/antes-camilo.jpg?v=2', pie: 'Original — Camilo' },
     { src: 'assets/img/bts/toma-camilo-navidad.jpg?v=2', pie: 'Transformada — Camilo', transformada: true },
     { src: 'assets/img/bts/raw-laura-2.jpg', pie: 'Original — Laura' }
   ],

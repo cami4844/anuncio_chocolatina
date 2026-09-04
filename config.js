@@ -16,17 +16,24 @@ window.CHACO_CONFIG = {
   },
 
   // ---------- QR DEL EMPAQUE ----------
-  // Cuando exista la URL definitiva del sitio, escríbela aquí.
-  // El QR físico del empaque debe apuntar exactamente a esa URL.
+  // URL conocida del QR físico impreso en el empaque (NO regenerar el QR).
+  // Si la arquitectura final cambia de dominio, documentar el impacto y
+  // actualizar aquí; el QR físico seguiría apuntando a la URL original.
   qr: {
-    urlDestino: '',                       // EJ: 'https://chacoquira.com'  (vacío = pendiente)
-    nota: 'El QR del empaque llegará a esta experiencia. URL por definir.'
+    urlDestino: 'https://cami4844.github.io/anuncio_chocolatina/',
+    nota: 'El QR del empaque llega a esta experiencia web.'
   },
 
   // ---------- REDES SOCIALES ----------
-  // Sin datos reales todavía: se muestran como "Próximamente".
-  // Cuando existan, agrega: { nombre: 'Instagram', url: 'https://instagram.com/...', usuario: '@chacoquira' }
-  redes: [],
+  // Páginas de marca CHACOQUIRA (clon local en código, dentro de /redes).
+  // Cuando existan perfiles reales, cambia cada url por la del perfil:
+  // { nombre: 'Instagram', url: 'https://instagram.com/...', usuario: '@chacoquira' }
+  redes: [
+    { nombre: 'Instagram', url: 'redes/instagram.html', usuario: '@chacoquira' },
+    { nombre: 'TikTok',    url: 'redes/tiktok.html',    usuario: '@chacoquira' },
+    { nombre: 'Facebook',  url: 'redes/facebook.html',  usuario: 'CHACOQUIRA' },
+    { nombre: 'WhatsApp',  url: 'redes/whatsapp.html',  usuario: 'Canal oficial' }
+  ],
 
   // ---------- MEDIA PRINCIPAL ----------
   media: {
@@ -44,14 +51,14 @@ window.CHACO_CONFIG = {
       nombre: 'Chocolatina Clásica',
       linea: 'La pieza de colección',
       descripcion: 'La chocolatina CHACOQUIRA con su envoltura de marca. Chocolate premium, formato perfecto para regalar (o no compartir).',
-      url: 'assets/modelo/chocolatina.glb'
+      url: 'assets/modelo/chocolatina.glb.js'
     },
     {
       id: 'trozos',
       nombre: 'Trozos y Masmelos',
       linea: 'El quiebre perfecto',
       descripcion: 'Chocolate partido con masmelos asomando. La textura que define a la marca: firme por fuera, suave por dentro.',
-      url: 'assets/modelo/chocolatinas.glb'
+      url: 'assets/modelo/chocolatinas.glb.js'
     }
   ],
 
@@ -60,5 +67,16 @@ window.CHACO_CONFIG = {
     duracionComercial: '70',   // segundos, solo informativo
     calidadChip: 'HD',         // etiqueta del chip de calidad
     anio: 2026
+  },
+
+  // ---------- PROTECCIÓN (capa navegador) ----------
+  // Capas activas: anti-captura (escritorio + móvil), disuasión de copia,
+  // aviso anti-IA codificado, velo de foco y registro Función D.
+  // Sin marca de agua repetida (la v3 la elimina: era un bug visual).
+  seguridad: {
+    antiCaptura: true,         // [B] PrintScreen/Ctrl+P/U/S interceptados + velo al perder foco
+    disuasionCopiado: true,    // [B] menú contextual/drag/long-press solo sobre medios
+    consolaAviso: true,        // [B] aviso de propiedad + prohibición para IA en consola
+    registroErrores: true      // [A] Función D: errores → localStorage, exportables
   }
 };
