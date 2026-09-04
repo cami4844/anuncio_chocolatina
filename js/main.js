@@ -15,8 +15,11 @@
   const fino = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const esMovil = window.matchMedia('(max-width: 760px)').matches;
 
-  /* El puntero es siempre el cursor nativo del sistema: lo que se ve es
-     exactamente donde se hace clic, en todas las páginas. */
+  /* El mouse personalizado es una IMAGEN nativa del navegador
+     (css/cursor.css): la tableta se dibuja exactamente en la posición
+     del puntero, hotspot 1,1. Sin capas DOM persiguiendo al mouse:
+     lo que se ve es donde se hace clic, siempre. Aquí solo quedan
+     las migas decorativas (pointer-events:none, no tocan clics). */
 
   /* ================= PRELOADER =================
      Sale con el DOM listo (+ una animación mínima), NO con window.load.
@@ -54,6 +57,37 @@
   document.addEventListener('DOMContentLoaded', () => setTimeout(preCierra, 300));
   window.addEventListener('load', preCierra);
   setTimeout(preCierra, 2600); // red de seguridad
+
+  /* ================= MIGAS DE CHOCOLATE (solo decoración) ================= */
+  if (fino && !reducido) {
+    let ultimaMiga = 0, migasVivas = 0;
+    function sueltaMiga(x, y, extra) {
+      migasVivas += 1;
+      const miga = document.createElement('span');
+      miga.className = 'miga' + (Math.random() < 0.3 ? ' clara' : (Math.random() < 0.14 ? ' rosada' : ''));
+      miga.style.left = (x + (Math.random() * 18 - 9)) + 'px';
+      miga.style.top = (y + (extra ? 8 : 10)) + 'px';
+      miga.style.setProperty('--mx', (Math.random() * (extra ? 40 : 26) - (extra ? 20 : 13)) + 'px');
+      miga.style.setProperty('--mr', (120 + Math.random() * 220) + 'deg');
+      document.body.appendChild(miga);
+      setTimeout(() => { miga.remove(); migasVivas -= 1; }, 950);
+    }
+    document.addEventListener('mousemove', (e) => {
+      window.__chacoX = e.clientX; window.__chacoY = e.clientY;
+      const ahora = performance.now();
+      if (ahora - ultimaMiga < 200 || migasVivas >= 6) return;
+      ultimaMiga = ahora;
+      sueltaMiga(e.clientX, e.clientY, false);
+    }, { passive: true });
+    document.addEventListener('mousedown', () => {
+      const x = window.__chacoX !== undefined ? window.__chacoX : innerWidth / 2;
+      const y = window.__chacoY !== undefined ? window.__chacoY : innerHeight / 2;
+      for (let i = 0; i < 2; i++) {
+        if (migasVivas >= 10) break;
+        sueltaMiga(x, y, true);
+      }
+    }, { passive: true });
+  }
 
   /* ================= NAVEGACIÓN ================= */
   const nav = $('#nav');

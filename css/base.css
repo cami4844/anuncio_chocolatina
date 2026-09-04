@@ -224,9 +224,29 @@ html.anim-js .rev-palabra { display: inline-block; opacity: 0; transform: transl
 .btn-audio.sonando .ecualizador i:nth-child(4) { animation-delay: 0.45s; }
 @keyframes ecualiza { 0%, 100% { height: 4px; } 50% { height: 12px; } }
 
-/* ---------- cursor nativo ----------
-   El puntero es el del sistema: coherencia total entre lo que se ve
-   y donde se hace clic (el cursor personalizado se retiró). */
+/* ---------- cursor de chocolate (nativo) ----------
+   La imagen del cursor vive en css/cursor.css: es el PROPIO navegador
+   el que dibuja la tableta exactamente en la posición del puntero
+   (hotspot 1,1). Cero retardo, cero desviación: lo que ves es donde
+   haces clic. Aquí solo van las migas decorativas que se desmoronan. */
+.miga {
+  position: fixed; z-index: 499;
+  width: 6px; height: 6px;
+  border-radius: 2px;
+  background: #4a2612;
+  pointer-events: none; /* NUNCA intercepta clics: es pura decoración */
+  opacity: 0.95;
+  animation: cae-miga 0.9s ease-in forwards;
+}
+.miga.clara { background: #8a5630; }
+.miga.rosada { background: #ff2d78; }
+@keyframes cae-miga {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 0.95; }
+  100% { transform: translate(var(--mx, 0px), 26px) rotate(var(--mr, 180deg)); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .miga { display: none; }
+}
 
 /* brillo cálido que sigue al mouse (hero) */
 .brillo-mouse {
