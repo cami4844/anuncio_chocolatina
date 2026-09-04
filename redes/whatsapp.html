@@ -135,7 +135,7 @@ body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch
 .barra-entrada .ico-btn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;color:var(--crema-suave);flex:none;position:relative}
 .barra-entrada .ico-btn:hover{background:rgba(233,185,92,.08)}
 .barra-entrada svg{width:20px;height:20px;fill:none;stroke:var(--crema-suave);stroke-width:1.8}
-.barra-entrada .campo{flex:1;display:flex;align-items:center;background:rgba(14,7,3,.75);border:1px solid rgba(233,185,92,.12);border-radius:12px;padding:.15rem .5rem .15rem 1rem}
+.barra-entrada .campo{flex:1;min-width:0;display:flex;align-items:center;background:rgba(14,7,3,.75);border:1px solid rgba(233,185,92,.12);border-radius:12px;padding:.15rem .5rem .15rem 1rem}
 .barra-entrada .campo input{flex:1;background:none;border:none;outline:none;color:var(--crema);font-size:.85rem;min-height:42px;min-width:0}
 .barra-entrada .campo input::placeholder{color:var(--gris)}
 .barra-entrada .enviar{width:42px;height:42px;border-radius:50%;background:var(--acento);display:grid;place-items:center;flex:none;transition:transform .15s}
@@ -170,7 +170,7 @@ body{-webkit-user-select:none!important;user-select:none!important;-webkit-touch
 
 /* ---- responsive: móvil, lista como panel ---- */
 @media(max-width:860px){
-  .canal-wa{grid-template-columns:1fr;grid-template-areas:"cabecera" "chat" "entrada";height:clamp(520px,calc(100dvh - 158px),940px);border-radius:12px;border-inline:none}
+  .canal-wa{grid-template-columns:minmax(0,1fr);grid-template-areas:"cabecera" "chat" "entrada";height:clamp(520px,calc(100dvh - 158px),940px);border-radius:12px;border-inline:none}
   .lista-chats{position:fixed;left:0;right:0;top:0;bottom:0;z-index:80;transform:translateX(-104%);transition:transform .3s ease;border-right:none}
   .canal-wa.ver-chats .lista-chats{transform:none}
   .btn-chats{display:inline-flex;align-items:center;gap:.4rem;margin-right:.4rem;padding:.4rem .8rem;border-radius:99px;border:1px solid rgba(233,185,92,.3);font-size:.72rem;font-weight:600;color:var(--oro);background:rgba(14,7,3,.6)}

@@ -33,7 +33,7 @@
     let activo = false;
     escena.addEventListener('pointerdown', (e) => {
       activo = true;
-      escena.setPointerCapture && escena.setPointerCapture(e.pointerId);
+      try { escena.setPointerCapture && escena.setPointerCapture(e.pointerId); } catch (err) {}
       desdeX(e.clientX);
     });
     escena.addEventListener('pointermove', (e) => { if (activo) desdeX(e.clientX); });

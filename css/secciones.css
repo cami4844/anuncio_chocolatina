@@ -81,8 +81,11 @@
   width: 100%; height: 40%;
   background: var(--masmelo);
   animation: baja-hilo 1.8s var(--ease-out) infinite;
+  will-change: transform;
 }
-@keyframes baja-hilo { to { top: 110%; } }
+/* ESTABILIDAD v5: antes animaba `top` (layout + repaint por frame).
+   Mismo recorrido con transform (compositor GPU). */
+@keyframes baja-hilo { from { transform: translateY(-100%); } to { transform: translateY(375%); } }
 
 /* ============ CONCEPTO ============ */
 .concepto { background: linear-gradient(180deg, var(--ch-negro), var(--ch-fondo) 55%, var(--ch-negro)); }
@@ -880,12 +883,26 @@
 .empaque-brillo {
   position: absolute; inset: 0;
   border-radius: inherit;
-  background: linear-gradient(115deg, transparent 30%, rgba(247, 236, 220, 0.1) 45%, transparent 60%);
-  background-size: 240% 240%;
-  animation: recorre-brillo 7s ease-in-out infinite;
+  overflow: hidden;
   pointer-events: none;
 }
-@keyframes recorre-brillo { 0%, 100% { background-position: 0% 0%; } 50% { background-position: 100% 100%; } }
+/* ESTABILIDAD v5 — CAUSA RAÍZ DEL CONGELAMIENTO: antes esta capa animaba
+   background-position: repintaba el empaque COMPLETO cada frame durante
+   toda la sesión. Mismo brillo diagonal que recorre la caja, ahora con
+   transform (compositor GPU, coste casi nulo). */
+.empaque-brillo::before {
+  content: '';
+  position: absolute; left: -45%; top: -70%;
+  width: 55%; height: 240%;
+  background: linear-gradient(115deg, transparent 32%, rgba(247, 236, 220, 0.11) 50%, transparent 68%);
+  transform: translateX(-160%) rotate(12deg);
+  animation: recorre-brillo 7s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes recorre-brillo {
+  0% { transform: translateX(-160%) rotate(12deg); }
+  100% { transform: translateX(430%) rotate(12deg); }
+}
 .empaque-fechas {
   display: flex; flex-wrap: wrap;
   justify-content: center;

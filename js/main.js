@@ -506,25 +506,50 @@
   const brillo = $('.brillo-mouse');
   if (brillo && fino && !reducido) {
     const hero = $('#inicio');
-    let bx = 0, by = 0, tx = 0, ty = 0;
+    let bx = 0, by = 0, tx = 0, ty = 0, rafBrillo = 0, brilloActivo = false;
     hero.addEventListener('mousemove', (e) => {
       const r = hero.getBoundingClientRect();
       tx = e.clientX - r.left; ty = e.clientY - r.top;
       brillo.classList.add('visible');
     }, { passive: true });
     hero.addEventListener('mouseleave', () => brillo.classList.remove('visible'));
-    (function sigue() {
+    function pasoBrillo() {
+      rafBrillo = 0;
+      if (!brilloActivo) return;
       bx += (tx - bx) * 0.08; by += (ty - by) * 0.08;
       // ESTABILIDAD: transform en vez de left/top (sin layout por frame)
       brillo.style.transform = 'translate3d(' + bx + 'px,' + by + 'px,0) translate(-50%,-50%)';
-      requestAnimationFrame(sigue);
-    })();
+      rafBrillo = requestAnimationFrame(pasoBrillo);
+    }
+    function despiertaBrillo() { if (!rafBrillo && brilloActivo) rafBrillo = requestAnimationFrame(pasoBrillo); }
+    /* ESTABILIDAD v5 — CAUSA RAÍZ DEL CONGELAMIENTO: este bucle se
+       re-programaba con requestAnimationFrame TODA LA VIDA, aunque el hero
+       estuviera fuera de pantalla o la pestaña escondida (medido: 60+ rAF/s
+       perpetuos). Ahora se duerme cuando el hero no está a la vista y
+       despierta al volver. Mismo efecto visual. */
+    new IntersectionObserver((en) => {
+      brilloActivo = en[0].isIntersecting;
+      if (brilloActivo) despiertaBrillo();
+    }, { threshold: 0.01 }).observe(hero);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) despiertaBrillo(); });
   }
 
   /* ================= MAGNETISMO =================
    Retirado: los botones ya se desplazan al acercar el mouse y eso
    hacía percibir el clic «en otra parte». Objetos fijos = puntero
    100% coherente. */
+
+  /* ================= ESTABILIDAD v5: ANIMACIONES SOLO EN VISTA =================
+     Los decorativos siempre-encendidos (cinta, hilo del hero, brillo del
+     empaque, pista del cierre) pausan su animación CSS cuando su zona sale
+     de la pantalla y la reanudan al volver. Cero cambio visual: estaba
+     fuera de vista. Menos GPU y menos hilo en máquinas modestas. */
+  if ('IntersectionObserver' in window) {
+    const obsPausa = new IntersectionObserver((ents) => {
+      ents.forEach((en) => en.target.classList.toggle('pausa-anim', !en.isIntersecting));
+    }, { threshold: 0.02 });
+    $$('.cinta, .hero-indicador, .empaque-brillo, .cierre-pista').forEach((el) => obsPausa.observe(el));
+  }
 
   /* ================= INCLINACIÓN 3D (empaque) ================= */
   if (fino && !reducido) {
@@ -550,6 +575,13 @@
       heroVideo.addEventListener('error', () => { heroVideo.style.display = 'none'; });
       const prom = heroVideo.play();
       if (prom && prom.catch) prom.catch(() => {});
+      /* ESTABILIDAD v5: fuera de la vista el loop se PAUSA (medido: seguía
+         decodificando con el hero fuera de pantalla, gastando CPU y batería
+         toda la sesión). Se reanuda solo al volver. */
+      new IntersectionObserver((en) => {
+        if (en[0].isIntersecting) { if (heroVideo.paused) { const p2 = heroVideo.play(); if (p2 && p2.catch) p2.catch(() => {}); } }
+        else if (!heroVideo.paused) heroVideo.pause();
+      }, { threshold: 0.05 }).observe(heroVideo.parentElement || heroVideo);
     }
   }
 

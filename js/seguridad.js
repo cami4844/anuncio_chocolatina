@@ -321,11 +321,31 @@
           '0%{transform:translateX(-170%) rotate(14deg)}' +
           '100%{transform:translateX(460%) rotate(14deg)}}' +
           '@media (prefers-reduced-motion:reduce){.chaco-velo-foto::before{animation:none;display:none}}' +
+          '/* ESTABILIDAD v5: con la imagen fuera de pantalla la animación se pausa */' +
+          '.chaco-velo-foto.foto-fuera::before{animation-play-state:paused}' +
           '.chaco-velo-foto.pulso::before{animation:none;display:none}' +
           '.chaco-velo-foto.pulso{transition:background .3s ease;' +
           'background:radial-gradient(circle at var(--px,50%) var(--py,50%),rgba(255,236,205,.14),transparent 55%)}';
         document.head.appendChild(st);
       } catch (e) {}
+    }
+
+    /* ESTABILIDAD v5 — CAUSA RAÍZ DEL CONGELAMIENTO (parte GPU): había un
+       brillo animado infinito POR CADA imagen protegida, seguía corriendo
+       aunque la imagen estuviera fuera de pantalla y, en páginas con muchas
+       fotos, eso presionaba la GPU de las máquinas modestas durante toda la
+       sesión. Ahora cada velo se pausa fuera de vista con UN observador
+       compartido y se reanuda solo al volver. Sin cambio visual. */
+    var ioFoto = null;
+    function ioFotoCompartido() {
+      if (!ioFoto && 'IntersectionObserver' in window) {
+        ioFoto = new IntersectionObserver(function (entradas) {
+          for (var i = 0; i < entradas.length; i++) {
+            entradas[i].target.classList.toggle('foto-fuera', !entradas[i].isIntersecting);
+          }
+        }, { threshold: 0.02 });
+      }
+      return ioFoto;
     }
 
     function aplicaCapaFoto() {
@@ -347,6 +367,8 @@
           velo.setAttribute('data-marca', MARCA + ' — CAMI');
           velo.setAttribute('aria-hidden', 'true');
           padre.appendChild(velo);
+          var io = ioFotoCompartido();
+          if (io) io.observe(velo);
         }
       } catch (e) {}
     }

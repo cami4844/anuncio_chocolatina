@@ -340,3 +340,11 @@ html.sin-anim .rev-palabra { opacity: 1 !important; transform: none !important; 
 
 /* ---------- reveals genéricos ---------- */
 .rev-cascada > * { transition-delay: 0s; }
+
+/* ---------- ESTABILIDAD v5: animaciones decorativas solo en vista ----------
+   main.js y seguridad.js añaden .pausa-anim / .foto-fuera cuando el elemento
+   sale de la pantalla. Al volver se reanuda sola. Sin cambio visual. */
+.pausa-anim, .pausa-anim::before, .pausa-anim::after,
+.pausa-anim *, .pausa-anim *::before, .pausa-anim *::after {
+  animation-play-state: paused !important;
+}

@@ -91,6 +91,13 @@
   let iniciado = false;
   let activo = CFG.modelos[0] ? CFG.modelos[0].id : null;
 
+  /* ESTABILIDAD v5: caché de escenas ya parseadas. Antes CADA cambio de tab
+     repetía atob + GLTFLoader.parse completos (bloqueo de ~2 s del hilo por
+     cambio). Con caché: primer vistazo parsea; los siguientes son
+     instantáneos. Al parsear se libera el string base64 (el módulo .glb.js
+     se queda sin referencia -> el recolector recupera esos MB). */
+  const CACHE_ESCENAS = {};
+
   // estado de interacción
   const st = {
     rotX: 0.12, rotY: -0.5,
@@ -207,16 +214,19 @@
 
   function limpiaModelo() {
     if (!modeloActual) return;
-    modeloActual.traverse((obj) => {
-      if (obj.geometry) obj.geometry.dispose();
-      if (obj.material) {
-        const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
-        mats.forEach((m) => {
-          Object.values(m).forEach((v) => { if (v && v.isTexture) v.dispose(); });
-          m.dispose();
-        });
-      }
-    });
+    /* si la escena está en caché NO se libera: se reutiliza al volver al tab */
+    if (!modeloActual.__cacheada) {
+      modeloActual.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          const mats = Array.isArray(obj.material) ? obj.material : [obj.material];
+          mats.forEach((m) => {
+            Object.values(m).forEach((v) => { if (v && v.isTexture) v.dispose(); });
+            m.dispose();
+          });
+        }
+      });
+    }
     grupoModelo.remove(modeloActual);
     modeloActual = null;
   }
@@ -233,6 +243,10 @@
   }
 
   function encajaModelo(objeto) {
+    /* idempotente: al reutilizar una escena de caché hay que resetear la
+       transformación antes de recalcular, si no se acumula el desplazamiento */
+    objeto.position.set(0, 0, 0);
+    objeto.scale.setScalar(1);
     const caja = new THREE.Box3().setFromObject(objeto);
     const tam = caja.getSize(new THREE.Vector3());
     const centro = caja.getCenter(new THREE.Vector3());
@@ -261,6 +275,21 @@
     const miId = ++cargandoId;
     cargaCaja.classList.remove('fuera');
     fallback.classList.remove('visible');
+
+    /* ESTABILIDAD v5: la pieza ya está parseada -> cambio de tab INSTANTÁNEO
+       (sin atob, sin re-parseo, sin bloqueo del hilo). */
+    if (CACHE_ESCENAS[def.id]) {
+      const escenaCache = CACHE_ESCENAS[def.id];
+      limpiaModelo();
+      modeloActual = encajaModelo(escenaCache);
+      grupoModelo.add(modeloActual);
+      st.rotY = -0.5; st.rotX = 0.12; st.dist = st.distObj = 6.2;
+      entraModelo();
+      cargaCaja.classList.add('fuera');
+      st.quietoDesde = performance.now();
+      return;
+    }
+
     if (cargaDato) cargaDato.textContent = 'Preparando la pieza…';
 
     /* red de seguridad: si la red se cuelga, nunca dejar la vitrina en falso */
@@ -313,6 +342,11 @@
             });
           }
         });
+        gltf.scene.__cacheada = true;
+        CACHE_ESCENAS[def.id] = gltf.scene;
+        /* el base64 ya se transformó en escena: liberarlo (recupera ~13 MB
+           por modelo y evita retener 27 MB de texto para siempre) */
+        try { if (window.CHACO_GLB) delete window.CHACO_GLB[def.id]; } catch (e) {}
         modeloActual = encajaModelo(gltf.scene);
         grupoModelo.add(modeloActual);
         st.rotY = -0.5; st.rotX = 0.12; st.dist = st.distObj = 6.2;
@@ -333,7 +367,7 @@
   /* ---------- interacción ---------- */
   function vinceGestos() {
     vitrina.addEventListener('pointerdown', (e) => {
-      vitrina.setPointerCapture && vitrina.setPointerCapture(e.pointerId);
+      try { vitrina.setPointerCapture && vitrina.setPointerCapture(e.pointerId); } catch (err) {}
       st.punteros.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (st.punteros.size === 1) {
         st.arrastrando = true;

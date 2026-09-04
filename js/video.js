@@ -167,7 +167,7 @@
     progreso.addEventListener('pointerdown', (e) => {
       if (usandoNativos) return;
       arrastrando = true;
-      progreso.setPointerCapture && progreso.setPointerCapture(e.pointerId);
+      try { progreso.setPointerCapture && progreso.setPointerCapture(e.pointerId); } catch (err) {}
       busca(e.clientX);
     });
     progreso.addEventListener('pointermove', (e) => { if (arrastrando) busca(e.clientX); });
